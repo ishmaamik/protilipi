@@ -2,12 +2,59 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import styles from './page.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 
-export default function BanglaChatbot() {
+export default function VoiceChatbot() {
   const [chatHistory, setChatHistory] = useState([]);
   const [question, setQuestion] = useState('');
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
   const chatContainerRef = useRef(null);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'bn-BD';
+
+      recognitionRef.current.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+
+        // Detect language
+        try {
+          const langResponse = await axios({
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCgyhYId0cuciUwpt_VL8yQVgrj9NKDVho`,
+            method: "post",
+            data: {
+              contents: [{
+                parts: [{
+                  text: `Detect the language of this text. Respond with ONLY 'Bangla' or 'English': ${transcript}`
+                }]
+              }],
+            },
+          });
+
+          const detectedLang = langResponse.data.candidates[0].content.parts[0].text.trim();
+
+          setQuestion(transcript);
+          setIsListening(false);
+        } catch (error) {
+          console.error('Language detection error:', error);
+          setQuestion(transcript);
+          setIsListening(false);
+        }
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -15,27 +62,41 @@ export default function BanglaChatbot() {
     }
   }, [chatHistory, generatingAnswer]);
 
+  const startVoiceInput = () => {
+    if (recognitionRef.current) {
+      setIsListening(true);
+      recognitionRef.current.start();
+    } else {
+      alert('Speech recognition not supported');
+    }
+  };
+
   async function generateAnswer(e) {
     e.preventDefault();
     if (!question.trim()) return;
-    
+
     setGeneratingAnswer(true);
     const currentQuestion = question;
     setQuestion('');
-    
+
     setChatHistory(prev => [...prev, { type: 'question', content: currentQuestion }]);
-    
+
     try {
       const response = await axios({
         url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCgyhYId0cuciUwpt_VL8yQVgrj9NKDVho`,
         method: "post",
         data: {
-          contents: [{ 
-            parts: [{ 
-              text: `Please answer the following question in Bangla (Bengali language). 
-              If the question is in English or Banglish, translate it to Bangla first and then answer. 
-              Your response must be entirely in Bangla script: ${currentQuestion}` 
-            }] 
+          contents: [{
+            parts: [{
+              text: `Develop a chatbot that can understand and respond to user queries in both Bangla and Banglish. 
+          The chatbot should be capable of detecting the language or code-switching in user input and provide responses entirely in Bangla.
+          It should effectively handle mixed Banglish sentences where users may combine Bangla and English in their queries.
+          The system should support a variety of common conversational contexts such as greetings, FAQs, and simple commands.
+          If the input is in Bangla or Banglish, respond in Bangla. 
+          If the input is entirely in English, still respond entirely in Bangla.
+
+          User query: ${currentQuestion}`
+            }]
           }],
         },
       });
@@ -44,9 +105,9 @@ export default function BanglaChatbot() {
       setChatHistory(prev => [...prev, { type: 'answer', content: aiResponse }]);
     } catch (error) {
       console.error(error);
-      setChatHistory(prev => [...prev, { 
-        type: 'answer', 
-        content: "দুঃখিত, কিছু সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন!" 
+      setChatHistory(prev => [...prev, {
+        type: 'answer',
+        content: "দুঃখিত, কিছু সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন!"
       }]);
     }
     setGeneratingAnswer(false);
@@ -60,14 +121,14 @@ export default function BanglaChatbot() {
             <h1>একুশে AI</h1>
             <p>আপনার কথোপকথন সঙ্গী</p>
           </div>
-          
-          <div 
+
+          <div
             ref={chatContainerRef}
             className={styles.chatContainer}
           >
             {chatHistory.map((chat, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`${styles.chatMessage} ${chat.type === 'question' ? styles.questionMessage : styles.answerMessage}`}
               >
                 <div className={styles.messageContent}>
@@ -82,7 +143,7 @@ export default function BanglaChatbot() {
               </div>
             )}
           </div>
-          
+
           <form onSubmit={generateAnswer} className={styles.inputForm}>
             <div className={styles.inputWrapper}>
               <textarea
@@ -99,13 +160,23 @@ export default function BanglaChatbot() {
                   }
                 }}
               />
-              <button 
-                type="submit" 
-                disabled={generatingAnswer}
-                className={styles.sendButton}
-              >
-                পাঠান
-              </button>
+              <div className={styles.buttonGroup}>
+                <button
+                  type="submit"
+                  disabled={generatingAnswer}
+                  className={styles.sendButton}
+                >
+                  পাঠান
+                </button>
+                <button
+                  type="button"
+                  onClick={startVoiceInput}
+                  disabled={generatingAnswer || isListening}
+                  className={`${styles.voiceButton} ${isListening ? styles.listeningButton : ''}`}
+                >
+                  <FontAwesomeIcon icon={faMicrophone} />
+                </button>
+              </div>
             </div>
           </form>
         </div>

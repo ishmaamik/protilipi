@@ -1,15 +1,60 @@
-import { useState, useRef, useEffect } from "react";
-import "./App.css";
-import axios from "axios";
-import ReactMarkdown from "react-markdown";
+"use client";
+import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
+import styles from './page.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 
-function App() {
+export default function VoiceChatbot() {
   const [chatHistory, setChatHistory] = useState([]);
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [question, setQuestion] = useState('');
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
-
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
   const chatContainerRef = useRef(null);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'bn-BD'; // Set default to Bangla
+
+      recognitionRef.current.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        
+        // Detect language
+        try {
+          const langResponse = await axios({
+            url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCgyhYId0cuciUwpt_VL8yQVgrj9NKDVho`,
+            method: "post",
+            data: {
+              contents: [{ 
+                parts: [{ 
+                  text: `Detect the language of this text. Respond with ONLY 'Bangla' or 'English': ${transcript}` 
+                }] 
+              }],
+            },
+          });
+
+          const detectedLang = langResponse.data.candidates[0].content.parts[0].text.trim();
+          
+          setQuestion(transcript);
+          setIsListening(false);
+        } catch (error) {
+          console.error('Language detection error:', error);
+          setQuestion(transcript);
+          setIsListening(false);
+        }
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -17,161 +62,120 @@ function App() {
     }
   }, [chatHistory, generatingAnswer]);
 
+  const startVoiceInput = () => {
+    if (recognitionRef.current) {
+      setIsListening(true);
+      recognitionRef.current.start();
+    } else {
+      alert('Speech recognition not supported');
+    }
+  };
+
   async function generateAnswer(e) {
     e.preventDefault();
     if (!question.trim()) return;
-
+    
     setGeneratingAnswer(true);
     const currentQuestion = question;
-    setQuestion(""); // Clear input immediately after sending
-
-    // Add user question to chat history
-    setChatHistory((prev) => [
-      ...prev,
-      { type: "question", content: currentQuestion },
-    ]);
-
+    setQuestion('');
+    
+    setChatHistory(prev => [...prev, { type: 'question', content: currentQuestion }]);
+    
     try {
       const response = await axios({
         url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCgyhYId0cuciUwpt_VL8yQVgrj9NKDVho`,
         method: "post",
         data: {
-          contents: [{ parts: [{ text: question }] }],
+          contents: [{ 
+            parts: [{ 
+              text: `Develop a chatbot that can understand and respond to user queries in both Bangla and Banglish. The chatbot should detect the language or code-switching in user input and provide responses entirely in Bangla. It should also handle mixed Banglish sentences where users may combine Bangla and English in their queries. The system should support a variety of common conversational contexts like greetings, FAQs, and simple commands. 
+              If the input is in Bangla, respond in Bangla. 
+              If the input is in English, respond in English: ${currentQuestion}` 
+            }] 
+          }],
         },
       });
 
-      const aiResponse =
-        response["data"]["candidates"][0]["content"]["parts"][0]["text"];
-      setChatHistory((prev) => [
-        ...prev,
-        { type: "answer", content: aiResponse },
-      ]);
-      setAnswer(aiResponse);
+      const aiResponse = response.data.candidates[0].content.parts[0].text;
+      setChatHistory(prev => [...prev, { type: 'answer', content: aiResponse }]);
     } catch (error) {
       console.error(error);
-      setAnswer("Sorry - Something went wrong. Please try again!");
+      setChatHistory(prev => [...prev, { 
+        type: 'answer', 
+        content: "দুঃখিত, কিছু সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন!" 
+      }]);
     }
     setGeneratingAnswer(false);
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-r from-blue-50 to-blue-100">
-      <div className="h-full max-w-4xl mx-auto flex flex-col p-3">
-        {/* Fixed Header */}
-        <header className="text-center py-4">
-          <a
-            href="https://github.com/Vishesh-Pandey/chat-ai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
-            <h1 className="text-4xl font-bold text-blue-500 hover:text-blue-600 transition-colors">
-              Chat AI
-            </h1>
-          </a>
-        </header>
-
-        {/* Scrollable Chat Container */}
-        <div
-          ref={chatContainerRef}
-          className="flex-1 overflow-y-auto mb-4 rounded-lg bg-white shadow-lg p-4 hide-scrollbar"
-        >
-          {chatHistory.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6">
-              <div className="bg-blue-50 rounded-xl p-8 max-w-2xl">
-                <h2 className="text-2xl font-bold text-blue-600 mb-4">
-                  Welcome to Chat AI! 👋
-                </h2>
-                <p className="text-gray-600 mb-4">
-                  I'm here to help you with anything you'd like to know. You can
-                  ask me about:
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <span className="text-blue-500">💡</span> General knowledge
-                  </div>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <span className="text-blue-500">🔧</span> Technical questions
-                  </div>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <span className="text-blue-500">📝</span> Writing assistance
-                  </div>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <span className="text-blue-500">🤔</span> Problem solving
-                  </div>
-                </div>
-                <p className="text-gray-500 mt-6 text-sm">
-                  Just type your question below and press Enter or click Send!
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              {chatHistory.map((chat, index) => (
-                <div
-                  key={index}
-                  className={`mb-4 ${
-                    chat.type === "question" ? "text-right" : "text-left"
-                  }`}
-                >
-                  <div
-                    className={`inline-block max-w-[80%] p-3 rounded-lg overflow-auto hide-scrollbar ${
-                      chat.type === "question"
-                        ? "bg-blue-500 text-white rounded-br-none"
-                        : "bg-gray-100 text-gray-800 rounded-bl-none"
-                    }`}
-                  >
-                    <ReactMarkdown className="overflow-auto hide-scrollbar">
-                      {chat.content}
-                    </ReactMarkdown>
-                  </div>
-                </div>
-              ))}
-            </>
-          )}
-          {generatingAnswer && (
-            <div className="text-left">
-              <div className="inline-block bg-gray-100 p-3 rounded-lg animate-pulse">
-                Thinking...
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Fixed Input Form */}
-        <form
-          onSubmit={generateAnswer}
-          className="bg-white rounded-lg shadow-lg p-4"
-        >
-          <div className="flex gap-2">
-            <textarea
-              required
-              className="flex-1 border border-gray-300 rounded p-3 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Ask anything..."
-              rows="2"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  generateAnswer(e);
-                }
-              }}
-            ></textarea>
-            <button
-              type="submit"
-              className={`px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors ${
-                generatingAnswer ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              disabled={generatingAnswer}
-            >
-              Send
-            </button>
+    <div className={styles.chatbotContainer}>
+      <div className={styles.chatbotWrapper}>
+        <div className={styles.chatbotCard}>
+          <div className={styles.chatbotHeader}>
+            <h1>একুশে AI</h1>
+            <p>আপনার কথোপকথন সঙ্গী</p>
           </div>
-        </form>
+          
+          <div 
+            ref={chatContainerRef}
+            className={styles.chatContainer}
+          >
+            {chatHistory.map((chat, index) => (
+              <div 
+                key={index} 
+                className={`${styles.chatMessage} ${chat.type === 'question' ? styles.questionMessage : styles.answerMessage}`}
+              >
+                <div className={styles.messageContent}>
+                  {chat.content}
+                </div>
+              </div>
+            ))}
+
+            {generatingAnswer && (
+              <div className={styles.thinkingIndicator}>
+                চিন্তা করছে...
+              </div>
+            )}
+          </div>
+          
+          <form onSubmit={generateAnswer} className={styles.inputForm}>
+            <div className={styles.inputWrapper}>
+              <textarea
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="আমাকে কিছু জিজ্ঞেস করুন..."
+                rows={2}
+                disabled={generatingAnswer}
+                className={styles.inputTextarea}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    generateAnswer(e);
+                  }
+                }}
+              />
+              <div className={styles.buttonGroup}>
+                <button 
+                  type="submit" 
+                  disabled={generatingAnswer}
+                  className={styles.sendButton}
+                >
+                  পাঠান
+                </button>
+                <button
+                type="button"
+                onClick={startVoiceInput}
+                disabled={generatingAnswer || isListening}
+                className={`${styles.voiceButton} ${isListening ? styles.listeningButton : ''}`}
+              >
+                <FontAwesomeIcon icon={faMicrophone} />
+              </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
 }
-
-export default App;
