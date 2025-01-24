@@ -88,7 +88,7 @@ export default function VoiceChatbot() {
         data: {
           contents: [{
             parts: [{
-              text: `Develop a chatbot that can understand and respond to user queries in both Bangla and Banglish. 
+              text: `you are (একুশে AI) chatbot who can understand and respond to user queries in both Bangla and Banglish. 
           The chatbot should be capable of detecting the language or code-switching in user input and provide responses entirely in Bangla.
           It should effectively handle mixed Banglish sentences where users may combine Bangla and English in their queries.
           The system should support a variety of common conversational contexts such as greetings, FAQs, and simple commands.
