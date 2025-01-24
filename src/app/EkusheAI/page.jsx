@@ -57,7 +57,7 @@ export default function BanglaChatbot() {
       <div className={styles.chatbotWrapper}>
         <div className={styles.chatbotCard}>
           <div className={styles.chatbotHeader}>
-            <h1>একুশে AI চ্যাটবট</h1>
+            <h1>একুশে AI</h1>
             <p>আপনার কথোপকথন সঙ্গী</p>
           </div>
           
