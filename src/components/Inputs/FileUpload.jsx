@@ -9,6 +9,7 @@ const FileUpload = ({ handleFileUpload }) => (
       id="file-upload"
       onChange={handleFileUpload}
       className="hidden"
+      accept=".pdf, .txt"
     />
   </label>
 );
