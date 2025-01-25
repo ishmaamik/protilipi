@@ -19,12 +19,12 @@ const links = [
   },
   {
     id: 3,
-    title: "EkusheAI",
+    title: "একুশেAI",
     url: "/EkusheAI",
   },
   {
     id: 4,
-    title: "Blog",
+    title: "কাহিনী",
     url: "/blog",
   },
   {
