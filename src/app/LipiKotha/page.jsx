@@ -3,9 +3,10 @@ import "regenerator-runtime/runtime";
 import React, { useState } from "react";
 import { IconCopy, IconStar, IconVolume } from "@tabler/icons-react";
 import FileUpload from "@/components/Inputs/FileUpload";
+import LanguageSelector from "@/components/Inputs/LanguageSelector";
 import useTranslate from "@/hooks/useTranslate";
 import styles from "./page.module.css";
-
+import SpeechRecognitionComponent from "@/components/SpeechRecognition/SpeechRecognition";
 const Home = () => {
   const [sourceText, setSourceText] = useState("");
   const [copied, setCopied] = useState(false);
@@ -41,9 +42,10 @@ const Home = () => {
       try {
         const response = await fetch("/api/parse-pdf", {
           method: "POST",
-          body: file,
+          headers: { "Content-Type": "application/pdf" },
+          body: await file.arrayBuffer(), // Convert the file to ArrayBuffer
         });
-
+  
         if (response.ok) {
           const { text } = await response.json();
           setSourceText(text); // Set extracted text to sourceText
@@ -62,56 +64,70 @@ const Home = () => {
     }
   };
   
+  
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <h1 className={styles.headerTitle}>
-          Lingua<span className={styles.headerHighlight}>Speak</span>
-        </h1>
-        <p className={styles.headerSubtitle}>
-          LinguaSpeak: Bridging Voices, Connecting Worlds.
-        </p>
-      </header>
+    {/* Header Section */}
+    <header className={styles.header}>
+      <h1 className={styles.headerTitle}>
+        Lingua<span className={styles.headerHighlight}>Speak</span>
+      </h1>
+      <p className={styles.headerSubtitle}>
+        LinguaSpeak: Bridging Voices, Connecting Worlds.
+      </p>
+    </header>
 
-      <div className={styles.translationContainer}>
-        {/* Source Language */}
-        <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Source Language</h2>
-          <textarea
-            className={styles.textarea}
-            value={sourceText}
-            onChange={(e) => setSourceText(e.target.value)}
-            placeholder="Enter text or upload a file"
-          />
-          <div className={styles.cardFooter}>
+    {/* Translation Cards */}
+    <div className={styles.translationContainer}>
+      {/* Source Language */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>Source Language</h2>
+        <textarea
+          className={styles.textarea}
+          value={sourceText}
+          onChange={(e) => setSourceText(e.target.value)}
+          placeholder="Enter text to translate"
+        />
+        <div className={styles.cardFooter}>
+          <div className={styles.icons}>
+            <SpeechRecognitionComponent setSourceText={setSourceText} />
             <FileUpload handleFileUpload={handleFileUpload} />
-            <span className={styles.charCount}>{sourceText.length} / 2000</span>
           </div>
+          <span className={styles.charCount}>{sourceText.length} / 2000</span>
         </div>
+      </div>
 
-        {/* Target Language */}
-        <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Target Language</h2>
-          <textarea
-            className={styles.textarea}
-            value={isLoading ? "Translating..." : targetText || ""}
-            readOnly
-            placeholder={error || "Translation will appear here"}
+      {/* Target Language */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>Target Language</h2>
+        <textarea
+          className={styles.textarea}
+          value={isLoading ? "Translating..." : targetText || ""}
+          readOnly
+          placeholder={error || "Translation will appear here"}
+        />
+        <div className={styles.cardFooter}>
+          <LanguageSelector
+            selectedLanguage={selectedLanguage}
+            setSelectedLanguage={setSelectedLanguage}
+            languages={languages}
           />
-          <div className={styles.cardFooter}>
-            <div className={styles.icons}>
-              <IconVolume onClick={() => handleAudioPlayback(targetText)} className={styles.icon} />
-              <IconCopy onClick={handleCopyToClipboard} className={styles.icon} />
-              <IconStar
-                onClick={handleFavorite}
-                className={`${styles.icon} ${favorite ? styles.activeIcon : ""}`}
-              />
-            </div>
+          <div className={styles.icons}>
+            <IconVolume
+              onClick={() => handleAudioPlayback(targetText)}
+              className={styles.icon}
+            />
+            <IconCopy onClick={handleCopyToClipboard} className={styles.icon} />
+            <IconStar
+              onClick={handleFavorite}
+              className={`${styles.icon} ${favorite ? styles.activeIcon : ""}`}
+            />
           </div>
         </div>
       </div>
     </div>
+  </div>
   );
 };
 
