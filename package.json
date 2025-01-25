@@ -11,6 +11,10 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@edgestore/react": "^0.2.2",
+    "@edgestore/server": "^0.2.2",
+    "@google/generative-ai": "^0.21.0",
+    "@tabler/icons-react": "^3.29.0",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "eslint": "8.41.0",
@@ -18,9 +22,12 @@
     "mongoose": "6.11.1",
     "next": "13.4.3",
     "next-auth": "^4.22.1",
+    "preline": "^2.7.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-markdown": "^9.0.3",
-    "swr": "^2.1.5"
+    "react-speech-recognition": "^3.10.0",
+    "swr": "^2.1.5",
+    "zod": "^3.24.1"
   }
 }
