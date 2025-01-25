@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import { getProviders, signIn, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-const Login = ({ url }) => {
+const Login = () => {
   const session = useSession();
   const router = useRouter();
   const params = useSearchParams();
@@ -22,18 +22,30 @@ const Login = ({ url }) => {
   }
 
   if (session.status === "authenticated") {
-    router?.push("/dashboard");
+    router.push("/dashboard");
+    return null;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const email = e.target[0].value;
     const password = e.target[1].value;
 
-    signIn("credentials", {
-      email,
-      password,
-    });
+    try {
+      const response = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (response?.error) {
+        setError(response.error);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    }
   };
 
   return (
@@ -54,29 +66,29 @@ const Login = ({ url }) => {
           required
           className={styles.input}
         />
-        <button className={styles.button}>Login</button>
-        {error && error}
+        <button type="submit" className={styles.button}>
+          Login
+        </button>
+        {error && <p className={styles.error}>{error}</p>}
       </form>
       <button
         onClick={() => {
           signIn("google");
         }}
-        className={styles.button + " " + styles.google}
+        className={`${styles.button} ${styles.google}`}
       >
         Login with Google
+      </button>
+      <button
+        onClick={() => signIn("github")}
+        className={`${styles.button} ${styles.github}`}
+      >
+        Login with GitHub
       </button>
       <span className={styles.or}>- OR -</span>
       <Link className={styles.link} href="/dashboard/register">
         Create new account
       </Link>
-      {/* <button
-        onClick={() => {
-          signIn("github");
-        }}
-        className={styles.button + " " + styles.github}
-      >
-        Login with Github
-      </button> */}
     </div>
   );
 };
