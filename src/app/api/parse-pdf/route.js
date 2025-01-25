@@ -1,26 +1,22 @@
+import { NextResponse } from "next/server";
 import pdf from "pdf-parse";
 
-export const config = {
-  api: {
-    bodyParser: false, // Disable default body parser
-  },
-};
+export const POST = async (request) => {
+  try {
+    // Extract raw binary data from the request
+    const buffer = await request.arrayBuffer();
+    const fileBuffer = Buffer.from(buffer); // Convert ArrayBuffer to Buffer for pdf-parse
 
-export default async function handler(req, res) {
-  if (req.method === "POST") {
-    const buffers = [];
-    req.on("data", (chunk) => buffers.push(chunk));
-    req.on("end", async () => {
-      const fileBuffer = Buffer.concat(buffers);
-      try {
-        const data = await pdf(fileBuffer);
-        res.status(200).json({ text: data.text });
-      } catch (error) {
-        console.error("Error parsing PDF:", error);
-        res.status(500).json({ error: "Failed to parse the PDF file." });
-      }
-    });
-  } else {
-    res.status(405).json({ error: "Method not allowed. Use POST." });
+    // Parse the PDF file
+    const data = await pdf(fileBuffer);
+
+    // Return extracted text as JSON response
+    return NextResponse.json({ text: data.text }, { status: 200 });
+  } catch (error) {
+    console.error("Error parsing PDF:", error);
+    return NextResponse.json(
+      { error: "Failed to parse the PDF file." },
+      { status: 500 }
+    );
   }
-}
+};
