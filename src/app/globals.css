@@ -38,3 +38,7 @@ a {
   flex-direction: column;
   justify-content: space-between;
 }
+
+body {
+  font-family: 'Noto Sans Bengali', sans-serif;
+}

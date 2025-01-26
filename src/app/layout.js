@@ -8,13 +8,20 @@ import AuthProvider from "@/components/AuthProvider/AuthProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Lama Dev",
+  title: "IUT_ACCESS_DENIED",
   description: "This is the description",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Google Fonts for Noto Sans Bengali */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider>
           <AuthProvider>

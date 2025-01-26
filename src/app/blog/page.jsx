@@ -1,13 +1,21 @@
+//path='src/app/blog/page.jsx'
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './page.module.css';
-import { 
+import {
   Save, FileText, Copy, Trash2, Edit, Download, Clock, ChevronDown,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Heading1, Quote,
   Mic
 } from 'lucide-react';
 import useTranslate from "@/hooks/useTranslate";
+import '@fontsource/inter'; // Import Inter font
+// import '@fontsource/arial';
+// Import Arial font
+//import '@fontsource/times-new-roman'; // Custom package for Times New Roman (optional)
+import '@fontsource/roboto'; // Example: Add another font
+// import '@fontsource/noto-sans-bengali';
+
 
 export default function KahiniEditor() {
   const [text, setText] = useState('');
@@ -19,17 +27,33 @@ export default function KahiniEditor() {
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  
+
   // New font-related states
   const [fonts] = useState([
-    'Inter', 
-    'Arial', 
-    'Times New Roman', 
-    'Courier New', 
-    'Verdana', 
-    'Georgia', 
-    'Palatino Linotype'
+    'Inter',
+    'Arial',
+    'Times New Roman',
+    'Roboto', // Example: Added Roboto
+    'Verdana',
+    'Georgia',
+    'Helvetica',
+    'Courier New',
+    'Ubuntu', // Default font on Ubuntu systems
+    'DejaVu Sans',
+    'DejaVu Serif',
+    'DejaVu Sans Mono', // Monospace font
+    'Liberation Sans',
+    'Liberation Serif',
+    'Liberation Mono',
+    'Noto Sans', // Common fallback font
+    'Cantarell', // Fedora-based font, also available on many Linux systems
+    'Noto Sans Bengali', // Preferred Bangla font
+    'Noto Serif Bengali', // Elegant serif Bangla font
+    'Lohit Bengali', // System-friendly Bangla font
+    'Mukta Malar', // Another modern Bangla font
+    'SolaimanLipi' // Popular manually-installed Bangla font
   ]);
+
   const [selectedFont, setSelectedFont] = useState('Inter');
   const [showFontDropdown, setShowFontDropdown] = useState(false);
 
@@ -39,7 +63,7 @@ export default function KahiniEditor() {
   const fontDropdownRef = useRef(null);
 
   const { targetText, isLoading, error } = useTranslate(
-    showTranslation ? text : '', 
+    showTranslation ? text : '',
     selectedLanguage
   );
 
@@ -61,18 +85,18 @@ export default function KahiniEditor() {
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       const editor = editorRef.current;
-      
+
       // Insert text at current cursor position or append
       if (editor) {
         const selection = window.getSelection();
         const range = selection.getRangeAt(0);
         const textNode = document.createTextNode(transcript + ' ');
         range.insertNode(textNode);
-        
+
         // Update text state
         setText(editor.innerHTML);
       }
-      
+
       setIsListening(false);
     };
 
@@ -89,12 +113,12 @@ export default function KahiniEditor() {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (languageDropdownRef.current && 
-          !languageDropdownRef.current.contains(event.target)) {
+      if (languageDropdownRef.current &&
+        !languageDropdownRef.current.contains(event.target)) {
         setShowLanguageDropdown(false);
       }
-      if (fontDropdownRef.current && 
-          !fontDropdownRef.current.contains(event.target)) {
+      if (fontDropdownRef.current &&
+        !fontDropdownRef.current.contains(event.target)) {
         setShowFontDropdown(false);
       }
     };
@@ -190,7 +214,7 @@ export default function KahiniEditor() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `story_${new Date().toISOString().slice(0,10)}.txt`;
+    link.download = `story_${new Date().toISOString().slice(0, 10)}.txt`;
     link.click();
   };
 
@@ -208,9 +232,9 @@ export default function KahiniEditor() {
 
   const handleUpdateSavedText = () => {
     if (selectedText) {
-      const updatedTexts = savedTexts.map(item => 
-        item.id === selectedText.id 
-          ? { ...item, content: text } 
+      const updatedTexts = savedTexts.map(item =>
+        item.id === selectedText.id
+          ? { ...item, content: text }
           : item
       );
       setSavedTexts(updatedTexts);
@@ -228,22 +252,22 @@ export default function KahiniEditor() {
           {/* Text Editor Toolbar */}
           <div className={styles.editorToolbar}>
             <div className={styles.toolbarGroup}>
-              <button 
-                className={styles.toolbarButton} 
+              <button
+                className={styles.toolbarButton}
                 onClick={() => applyFormatting('bold')}
                 title="Bold"
               >
                 <Bold size={16} />
               </button>
-              <button 
-                className={styles.toolbarButton} 
+              <button
+                className={styles.toolbarButton}
                 onClick={() => applyFormatting('italic')}
                 title="Italic"
               >
                 <Italic size={16} />
               </button>
-              <button 
-                className={styles.toolbarButton} 
+              <button
+                className={styles.toolbarButton}
                 onClick={() => applyFormatting('underline')}
                 title="Underline"
               >
@@ -252,15 +276,15 @@ export default function KahiniEditor() {
             </div>
 
             <div className={styles.toolbarGroup}>
-              <button 
-                className={styles.toolbarButton} 
+              <button
+                className={styles.toolbarButton}
                 onClick={() => applyFormatting('heading')}
                 title="Heading"
               >
                 <Heading1 size={16} />
               </button>
-              <button 
-                className={styles.toolbarButton} 
+              <button
+                className={styles.toolbarButton}
                 onClick={() => applyFormatting('quote')}
                 title="Quote"
               >
@@ -269,15 +293,15 @@ export default function KahiniEditor() {
             </div>
 
             <div className={styles.toolbarGroup}>
-              <button 
-                className={styles.toolbarButton} 
+              <button
+                className={styles.toolbarButton}
                 onClick={() => applyFormatting('bulletList')}
                 title="Bullet List"
               >
                 <List size={16} />
               </button>
-              <button 
-                className={styles.toolbarButton} 
+              <button
+                className={styles.toolbarButton}
                 onClick={() => applyFormatting('numberedList')}
                 title="Numbered List"
               >
@@ -286,11 +310,11 @@ export default function KahiniEditor() {
             </div>
 
             {/* Font Selector */}
-            <div 
-              className={styles.toolbarGroup} 
+            <div
+              className={styles.toolbarGroup}
               ref={fontDropdownRef}
             >
-              <div 
+              <div
                 className={styles.languageSelector}
                 onClick={() => setShowFontDropdown(!showFontDropdown)}
                 style={{ fontFamily: selectedFont }}
@@ -301,14 +325,14 @@ export default function KahiniEditor() {
               {showFontDropdown && (
                 <div className={styles.languageDropdown}>
                   {fonts.map(font => (
-                    <div 
+                    <div
                       key={font}
                       className={styles.languageOption}
                       style={{ fontFamily: font }}
                       onClick={() => {
                         setSelectedFont(font);
                         setShowFontDropdown(false);
-                        
+
                         // Apply font to entire editor
                         if (editorRef.current) {
                           editorRef.current.style.fontFamily = font;
@@ -335,7 +359,7 @@ export default function KahiniEditor() {
 
           {/* Voice-to-Text Button */}
           <div className={styles.voiceToTextWrapper}>
-            <button 
+            <button
               className={`${styles.voiceToTextButton} ${isListening ? styles.active : ''}`}
               onClick={startListening}
               disabled={isListening}
@@ -349,7 +373,7 @@ export default function KahiniEditor() {
           {/* Language Selector and Action Buttons */}
           <div className={styles.editorControls}>
             <div className={styles.languageSelectorWrapper} ref={languageDropdownRef}>
-              <div 
+              <div
                 className={styles.languageSelector}
                 onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
               >
@@ -359,7 +383,7 @@ export default function KahiniEditor() {
               {showLanguageDropdown && (
                 <div className={styles.languageDropdown}>
                   {languages.map(lang => (
-                    <div 
+                    <div
                       key={lang}
                       className={styles.languageOption}
                       onClick={() => {
@@ -372,7 +396,7 @@ export default function KahiniEditor() {
                   ))}
                 </div>
               )}
-              <button 
+              <button
                 className={styles.translateButton}
                 onClick={() => setShowTranslation(!showTranslation)}
               >
@@ -382,28 +406,28 @@ export default function KahiniEditor() {
 
             <div className={styles.actionButtons}>
               {isEditMode ? (
-                <button 
+                <button
                   onClick={handleUpdateSavedText}
                   className={styles.smallButton}
                 >
                   Update
                 </button>
               ) : (
-                <button 
-                  onClick={handleSave} 
+                <button
+                  onClick={handleSave}
                   className={styles.smallButton}
                 >
                   <Save size={16} />
                 </button>
               )}
-              <button 
-                onClick={handleCopy} 
+              <button
+                onClick={handleCopy}
                 className={styles.smallButton}
               >
                 <Copy size={16} />
               </button>
-              <button 
-                onClick={handleDownload} 
+              <button
+                onClick={handleDownload}
                 className={styles.smallButton}
               >
                 <Download size={16} />
@@ -414,14 +438,14 @@ export default function KahiniEditor() {
           {/* Translation Section */}
           {showTranslation && targetText && (
             <div className={styles.compactTranslationWrapper}>
-              <textarea 
+              <textarea
                 className={styles.translatedTextArea}
                 value={isLoading ? "Translating..." : targetText || ""}
                 readOnly
                 placeholder={error || "Translation"}
               />
               <div className={styles.translationActions}>
-                <button 
+                <button
                   onClick={() => navigator.clipboard.writeText(targetText)}
                   className={styles.smallButton}
                 >
@@ -449,13 +473,13 @@ export default function KahiniEditor() {
                   <Clock size={12} /> {savedText.timestamp}
                 </span>
                 <div className={styles.actionIcons}>
-                  <button 
+                  <button
                     onClick={() => handleEdit(savedText)}
                     className={styles.smallButton}
                   >
                     <Edit size={14} />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDelete(savedText.id)}
                     className={styles.smallButton}
                   >
@@ -471,4 +495,3 @@ export default function KahiniEditor() {
   );
 }
 
-                
