@@ -1,0 +1,48 @@
+/* src/app/collab/page.module.css */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  
+  .editor {
+    width: 80%;
+    height: 60%;
+    padding: 20px;
+    font-size: 16px;
+    border: 1px solid #444; /* Dark border */
+    border-radius: 8px;
+    background-color: #1e1e1e; /* Dark gray background */
+    color: #ffffff; /* White text color */
+    resize: none; /* Disable resizing */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  }
+  
+  .editor::placeholder {
+    color: #666; /* Light gray placeholder text */
+  }
+  
+  .editor:focus {
+    outline: none;
+    border-color: #666; /* Light gray border on focus */
+  }
+
+  /* Custom scrollbar for the text editor */
+.editor::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor::-webkit-scrollbar-track {
+  background: #1e1e1e; /* Dark track */
+}
+
+.editor::-webkit-scrollbar-thumb {
+  background: #444; /* Dark thumb */
+  border-radius: 4px;
+}
+
+.editor::-webkit-scrollbar-thumb:hover {
+  background: #666; /* Lighter thumb on hover */
+}
