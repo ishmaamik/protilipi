@@ -24,24 +24,30 @@ const links = [
   },
   {
     id: 4,
-    title: "কাহিনী",
-    url: "/blog",
+    title: "আলাপন",
+    url: "/collab",
   },
   {
     id: 5,
+    title: "কানন",
+    url: "/blog",
+  },
+  {
+    id: 6,
     title: "About",
     url: "/about",
   },
   {
-    id: 6,
+    id: 7,
     title: "Contact",
     url: "/contact",
   },
   {
-    id: 7,
+    id: 8,
     title: "Dashboard",
     url: "/dashboard",
   },
+  
 ];
 
 const Navbar = () => {
