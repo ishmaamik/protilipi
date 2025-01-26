@@ -18,24 +18,61 @@ export default function KahiniEditor() {
   const [selectedLanguage, setSelectedLanguage] = useState("Bengali");
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
-  const [isListening, setIsListening] = useState(false); // Track if voice-to-text is active
+  const [isListening, setIsListening] = useState(false);
+  
+  // New font-related states
+  const [fonts] = useState([
+    'Inter', 
+    'Arial', 
+    'Times New Roman', 
+    'Courier New', 
+    'Verdana', 
+    'Georgia', 
+    'Palatino Linotype'
+  ]);
+  const [selectedFont, setSelectedFont] = useState('Inter');
+  const [showFontDropdown, setShowFontDropdown] = useState(false);
+
   const textareaRef = useRef(null);
   const editorRef = useRef(null);
   const languageDropdownRef = useRef(null);
+  const fontDropdownRef = useRef(null);
+
+  const { targetText, isLoading, error } = useTranslate(
+    showTranslation ? text : '', 
+    selectedLanguage
+  );
 
   // Speech Recognition Logic
   const startListening = () => {
+    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+
     setIsListening(true);
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = selectedLanguage; // Set language for recognition
-    recognition.interimResults = false; // Get final results only
-    recognition.maxAlternatives = 1; // Get only one result
+    recognition.lang = selectedLanguage;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
     recognition.start();
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      setText((prevText) => prevText + ' ' + transcript); // Append recognized text to the textarea
+      const editor = editorRef.current;
+      
+      // Insert text at current cursor position or append
+      if (editor) {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const textNode = document.createTextNode(transcript + ' ');
+        range.insertNode(textNode);
+        
+        // Update text state
+        setText(editor.innerHTML);
+      }
+      
       setIsListening(false);
     };
 
@@ -49,23 +86,22 @@ export default function KahiniEditor() {
     };
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (languageDropdownRef.current && 
           !languageDropdownRef.current.contains(event.target)) {
         setShowLanguageDropdown(false);
       }
+      if (fontDropdownRef.current && 
+          !fontDropdownRef.current.contains(event.target)) {
+        setShowFontDropdown(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const { targetText, isLoading, error } = useTranslate(
-    showTranslation ? text : '', 
-    selectedLanguage
-  );
 
   // Text Formatting Functions
   const applyFormatting = (formatType) => {
@@ -249,33 +285,50 @@ export default function KahiniEditor() {
               </button>
             </div>
 
-            <div className={styles.toolbarGroup}>
-              <button 
-                className={styles.toolbarButton} 
-                title="Align Left"
+            {/* Font Selector */}
+            <div 
+              className={styles.toolbarGroup} 
+              ref={fontDropdownRef}
+            >
+              <div 
+                className={styles.languageSelector}
+                onClick={() => setShowFontDropdown(!showFontDropdown)}
+                style={{ fontFamily: selectedFont }}
               >
-                <AlignLeft size={16} />
-              </button>
-              <button 
-                className={styles.toolbarButton} 
-                title="Align Center"
-              >
-                <AlignCenter size={16} />
-              </button>
-              <button 
-                className={styles.toolbarButton} 
-                title="Align Right"
-              >
-                <AlignRight size={16} />
-              </button>
+                {selectedFont}
+                <ChevronDown size={16} />
+              </div>
+              {showFontDropdown && (
+                <div className={styles.languageDropdown}>
+                  {fonts.map(font => (
+                    <div 
+                      key={font}
+                      className={styles.languageOption}
+                      style={{ fontFamily: font }}
+                      onClick={() => {
+                        setSelectedFont(font);
+                        setShowFontDropdown(false);
+                        
+                        // Apply font to entire editor
+                        if (editorRef.current) {
+                          editorRef.current.style.fontFamily = font;
+                        }
+                      }}
+                    >
+                      {font}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Replace Textarea with contentEditable Div */}
+          {/* Editor with dynamic font */}
           <div
             ref={editorRef}
             className={styles.textArea}
             contentEditable
+            style={{ fontFamily: selectedFont }}
             onInput={(e) => setText(e.target.innerHTML)}
             placeholder="Start writing your story..."
           />
@@ -417,3 +470,5 @@ export default function KahiniEditor() {
     </div>
   );
 }
+
+                
