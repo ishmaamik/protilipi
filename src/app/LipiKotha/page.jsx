@@ -13,7 +13,7 @@ const Home = () => {
   const [sourceText, setSourceText] = useState("");
   const [copied, setCopied] = useState(false);
   const [favorite, setFavorite] = useState(false);
-  const [languages] = useState(["English", "Spanish", "French", "German", "Chinese"]);
+  const [languages] = useState(["English", "Spanish", "French", "German", "Chinese", "Bengali"]);
   const [selectedLanguage, setSelectedLanguage] = useState("Spanish");
   const [extractedText, setExtractedText] = useState(""); // Holds extracted OCR text
   const [loading, setLoading] = useState(false); // Loading state for OCR processing
@@ -48,30 +48,49 @@ const Home = () => {
       return;
     }
   
-    if (!file.type.includes("image")) {
-      alert("This implementation supports image files only. Please upload an image.");
-      return;
-    }
-  
     try {
       setLoading(true); // Start loading spinner
   
-      const fileReader = new FileReader();
+      if (file.type === "application/pdf") {
+        // Handle PDF file
+        const fileReader = new FileReader();
   
-      fileReader.onload = async () => {
-        const image = fileReader.result; // Base64 of the image
+        fileReader.onload = async () => {
+          const pdfData = new Uint8Array(fileReader.result); // Convert to ArrayBuffer
   
-        // Perform OCR using Tesseract.js with PSM 6
-        const { data } = await Tesseract.recognize(image, "ben", {
-          logger: (info) => console.log(info), // Optional: log progress
-          tessedit_pageseg_mode: 6, // Treat as a single uniform block of text
-        });
+          // Load and process the PDF using Tesseract.js
+          const pdf = await Tesseract.recognize(pdfData, "eng+ben", {
+            logger: (info) => console.log(info), // Optional: log progress
+            tessedit_pageseg_mode: 6, // Treat as a single uniform block of text
+          });
   
-        setSourceText(data.text.replace(/\n/g, " ")); // Replace newlines with spaces for a single-line result
-        setLoading(false); // Stop loading spinner
-      };
+          setSourceText(pdf.data.text.replace(/\n/g, " ")); // Replace newlines with spaces for a single-line result
+          setLoading(false); // Stop loading spinner
+        };
   
-      fileReader.readAsDataURL(file); // Read the file as Base64
+        fileReader.readAsArrayBuffer(file); // Read the file as ArrayBuffer
+      } else if (file.type.includes("image")) {
+        // Handle image file
+        const fileReader = new FileReader();
+  
+        fileReader.onload = async () => {
+          const image = fileReader.result; // Base64 of the image
+  
+          // Perform OCR using Tesseract.js
+          const { data } = await Tesseract.recognize(image, "eng+ben",{
+            logger: (info) => console.log(info), // Optional: log progress
+            tessedit_pageseg_mode: 6, // Treat as a single uniform block of text
+          });
+  
+          setSourceText(data.text.replace(/\n/g, " ")); // Replace newlines with spaces for a single-line result
+          setLoading(false); // Stop loading spinner
+        };
+  
+        fileReader.readAsDataURL(file); // Read the file as Base64
+      } else {
+        alert("Unsupported file type. Please upload an image or a PDF.");
+        setLoading(false);
+      }
     } catch (error) {
       console.error("Error processing the file:", error);
       alert("An error occurred while processing the file. Please try again.");
@@ -138,12 +157,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* OCR Text Display */}
-      <div>
-        <h2>Extracted OCR Text</h2>
-        {loading ? <p>Processing image, please wait...</p> : <p>{extractedText || "No text extracted yet."}</p>}
       </div>
     </div>
   );
