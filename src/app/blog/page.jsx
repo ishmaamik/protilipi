@@ -3,16 +3,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './page.module.css';
 import { 
-  Save, 
-  FileText, 
-  Copy, 
-  Trash2, 
-  Edit, 
-  Download, 
-  Clock,
-  Volume2,
+  Save, FileText, Copy, Trash2, Edit, Download, Clock, ChevronDown,
+  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Heading1, Quote,
+  Mic
 } from 'lucide-react';
-import LanguageSelector from "@/components/Inputs/LanguageSelector";
 import useTranslate from "@/hooks/useTranslate";
 
 export default function KahiniEditor() {
@@ -22,31 +16,120 @@ export default function KahiniEditor() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [languages] = useState(["English", "Bengali", "Hindi", "Spanish", "Arabic"]);
   const [selectedLanguage, setSelectedLanguage] = useState("Bengali");
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
+  const [isListening, setIsListening] = useState(false); // Track if voice-to-text is active
   const textareaRef = useRef(null);
+  const editorRef = useRef(null);
+  const languageDropdownRef = useRef(null);
+
+  // Speech Recognition Logic
+  const startListening = () => {
+    setIsListening(true);
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = selectedLanguage; // Set language for recognition
+    recognition.interimResults = false; // Get final results only
+    recognition.maxAlternatives = 1; // Get only one result
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setText((prevText) => prevText + ' ' + transcript); // Append recognized text to the textarea
+      setIsListening(false);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (languageDropdownRef.current && 
+          !languageDropdownRef.current.contains(event.target)) {
+        setShowLanguageDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const { targetText, isLoading, error } = useTranslate(
     showTranslation ? text : '', 
     selectedLanguage
   );
 
-  // Auto-resize textarea
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  }, [text]);
+  // Text Formatting Functions
+  const applyFormatting = (formatType) => {
+    const editor = editorRef.current;
+    if (!editor) return;
 
-  // Load saved texts on component mount
-  useEffect(() => {
-    const savedData = localStorage.getItem('kahiniTexts');
-    if (savedData) {
-      setSavedTexts(JSON.parse(savedData));
-    }
-  }, []);
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
 
+    const range = selection.getRangeAt(0);
+    const selectedText = range.toString();
+
+    let formattedText = document.createElement('span');
+    switch (formatType) {
+      case 'bold':
+        formattedText.style.fontWeight = 'bold';
+        break;
+      case 'italic':
+        formattedText.style.fontStyle = 'italic';
+        break;
+      case 'underline':
+        formattedText.style.textDecoration = 'underline';
+        break;
+      case 'quote':
+        formattedText.style.fontStyle = 'italic';
+        formattedText.style.borderLeft = '2px solid #ccc';
+        formattedText.style.paddingLeft = '8px';
+        break;
+      case 'heading':
+        formattedText.style.fontSize = '1.5em';
+        formattedText.style.fontWeight = 'bold';
+        break;
+      case 'bulletList':
+        formattedText = document.createElement('ul');
+        selectedText.split('\n').forEach(line => {
+          const li = document.createElement('li');
+          li.textContent = line;
+          formattedText.appendChild(li);
+        });
+        break;
+      case 'numberedList':
+        formattedText = document.createElement('ol');
+        selectedText.split('\n').forEach((line, index) => {
+          const li = document.createElement('li');
+          li.textContent = line;
+          formattedText.appendChild(li);
+        });
+        break;
+    }
+
+    if (['bulletList', 'numberedList'].includes(formatType)) {
+      range.deleteContents();
+      range.insertNode(formattedText);
+    } else {
+      formattedText.textContent = selectedText;
+      range.deleteContents();
+      range.insertNode(formattedText);
+    }
+
+    // Update the text state
+    setText(editor.innerHTML);
+  };
+
+  // Core Functions
   const handleSave = () => {
     if (text.trim()) {
       const newSavedText = {
@@ -57,8 +140,6 @@ export default function KahiniEditor() {
       const updatedTexts = [...savedTexts, newSavedText];
       setSavedTexts(updatedTexts);
       localStorage.setItem('kahiniTexts', JSON.stringify(updatedTexts));
-      
-      // Reset fields
       setText('');
     }
   };
@@ -75,11 +156,6 @@ export default function KahiniEditor() {
     link.href = url;
     link.download = `story_${new Date().toISOString().slice(0,10)}.txt`;
     link.click();
-  };
-
-  const handleAudioPlayback = (textToSpeak) => {
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    window.speechSynthesis.speak(utterance);
   };
 
   const handleDelete = (id) => {
@@ -103,8 +179,6 @@ export default function KahiniEditor() {
       );
       setSavedTexts(updatedTexts);
       localStorage.setItem('kahiniTexts', JSON.stringify(updatedTexts));
-      
-      // Reset edit mode
       setIsEditMode(false);
       setSelectedText(null);
       setText('');
@@ -115,22 +189,136 @@ export default function KahiniEditor() {
     <div className={styles.redesignedContainer}>
       <div className={styles.editorSection}>
         <div className={styles.editorWrapper}>
-          <textarea 
-            ref={textareaRef}
-            className={styles.textArea} 
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+          {/* Text Editor Toolbar */}
+          <div className={styles.editorToolbar}>
+            <div className={styles.toolbarGroup}>
+              <button 
+                className={styles.toolbarButton} 
+                onClick={() => applyFormatting('bold')}
+                title="Bold"
+              >
+                <Bold size={16} />
+              </button>
+              <button 
+                className={styles.toolbarButton} 
+                onClick={() => applyFormatting('italic')}
+                title="Italic"
+              >
+                <Italic size={16} />
+              </button>
+              <button 
+                className={styles.toolbarButton} 
+                onClick={() => applyFormatting('underline')}
+                title="Underline"
+              >
+                <Underline size={16} />
+              </button>
+            </div>
+
+            <div className={styles.toolbarGroup}>
+              <button 
+                className={styles.toolbarButton} 
+                onClick={() => applyFormatting('heading')}
+                title="Heading"
+              >
+                <Heading1 size={16} />
+              </button>
+              <button 
+                className={styles.toolbarButton} 
+                onClick={() => applyFormatting('quote')}
+                title="Quote"
+              >
+                <Quote size={16} />
+              </button>
+            </div>
+
+            <div className={styles.toolbarGroup}>
+              <button 
+                className={styles.toolbarButton} 
+                onClick={() => applyFormatting('bulletList')}
+                title="Bullet List"
+              >
+                <List size={16} />
+              </button>
+              <button 
+                className={styles.toolbarButton} 
+                onClick={() => applyFormatting('numberedList')}
+                title="Numbered List"
+              >
+                <ListOrdered size={16} />
+              </button>
+            </div>
+
+            <div className={styles.toolbarGroup}>
+              <button 
+                className={styles.toolbarButton} 
+                title="Align Left"
+              >
+                <AlignLeft size={16} />
+              </button>
+              <button 
+                className={styles.toolbarButton} 
+                title="Align Center"
+              >
+                <AlignCenter size={16} />
+              </button>
+              <button 
+                className={styles.toolbarButton} 
+                title="Align Right"
+              >
+                <AlignRight size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Replace Textarea with contentEditable Div */}
+          <div
+            ref={editorRef}
+            className={styles.textArea}
+            contentEditable
+            onInput={(e) => setText(e.target.innerHTML)}
             placeholder="Start writing your story..."
-            rows={5}
           />
 
+          {/* Voice-to-Text Button */}
+          <div className={styles.voiceToTextWrapper}>
+            <button 
+              className={`${styles.voiceToTextButton} ${isListening ? styles.active : ''}`}
+              onClick={startListening}
+              disabled={isListening}
+              title="Voice to Text"
+            >
+              <Mic size={16} />
+              {isListening ? "Listening..." : ""}
+            </button>
+          </div>
+
+          {/* Language Selector and Action Buttons */}
           <div className={styles.editorControls}>
-            <div className={styles.languageSelectorWrapper}>
-              <LanguageSelector
-                selectedLanguage={selectedLanguage}
-                setSelectedLanguage={setSelectedLanguage}
-                languages={languages}
-              />
+            <div className={styles.languageSelectorWrapper} ref={languageDropdownRef}>
+              <div 
+                className={styles.languageSelector}
+                onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+              >
+                {selectedLanguage}
+                <ChevronDown size={16} />
+              </div>
+              {showLanguageDropdown && (
+                <div className={styles.languageDropdown}>
+                  {languages.map(lang => (
+                    <div 
+                      key={lang}
+                      className={styles.languageOption}
+                      onClick={() => {
+                        setSelectedLanguage(lang);
+                        setShowLanguageDropdown(false);
+                      }}
+                    >
+                      {lang}
+                    </div>
+                  ))}
+                </div>
+              )}
               <button 
                 className={styles.translateButton}
                 onClick={() => setShowTranslation(!showTranslation)}
@@ -167,44 +355,32 @@ export default function KahiniEditor() {
               >
                 <Download size={16} />
               </button>
-              <button 
-                onClick={() => handleAudioPlayback(text)} 
-                className={styles.smallButton}
-              >
-                <Volume2 size={16} />
-              </button>
             </div>
           </div>
 
-          {showTranslation && (
-            <div className={styles.translationWrapper}>
+          {/* Translation Section */}
+          {showTranslation && targetText && (
+            <div className={styles.compactTranslationWrapper}>
               <textarea 
                 className={styles.translatedTextArea}
                 value={isLoading ? "Translating..." : targetText || ""}
                 readOnly
-                placeholder={error || "Translation will appear here"}
+                placeholder={error || "Translation"}
               />
-              {targetText && (
-                <div className={styles.translationActions}>
-                  <button 
-                    onClick={() => handleAudioPlayback(targetText)}
-                    className={styles.smallButton}
-                  >
-                    <Volume2 size={16} />
-                  </button>
-                  <button 
-                    onClick={() => navigator.clipboard.writeText(targetText)}
-                    className={styles.smallButton}
-                  >
-                    <Copy size={16} />
-                  </button>
-                </div>
-              )}
+              <div className={styles.translationActions}>
+                <button 
+                  onClick={() => navigator.clipboard.writeText(targetText)}
+                  className={styles.smallButton}
+                >
+                  <Copy size={16} />
+                </button>
+              </div>
             </div>
           )}
         </div>
       </div>
 
+      {/* Saved Stories Section */}
       <div className={styles.savedSection}>
         <h2 className={styles.savedTitle}>
           <FileText size={20} /> Saved Stories

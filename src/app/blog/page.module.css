@@ -7,15 +7,18 @@
 }
 
 .editorSection {
-  width: 70%;
-  padding: 2rem;
+  width: 75%;
+  padding: 0.8rem;
+  border-radius: 8px;
 }
 
 .savedSection {
-  width: 30%;
-  padding: 2rem;
+  width: 25%;
+  padding: 0.5rem;
   background-color: #1e1e1e;
   border-left: 1px solid #333;
+  overflow-y: auto;
+  border-radius: 6px;
 }
 
 .editorWrapper {
@@ -23,6 +26,42 @@
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.editorToolbar {
+  display: flex;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 0.2rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.toolbarGroup {
+  display: flex;
+  gap: 0.2rem;
+  align-items: center;
+  border-right: 1px solid #444;
+  padding-right: 1rem;
+}
+
+.toolbarGroup:last-child {
+  border-right: none;
+}
+
+.toolbarButton {
+  background-color: transparent;
+  color: #e0e0e0;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toolbarButton:hover {
+  background-color: #333;
 }
 
 .textArea {
@@ -34,7 +73,12 @@
   outline: none;
   font-size: 1rem;
   line-height: 1.6;
-  min-height: 300px;
+  min-height: 350px;
+}
+
+.textArea:empty::before {
+  content: attr(placeholder);
+  color: #666;
 }
 
 .editorControls {
@@ -48,48 +92,53 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  position: relative;
 }
 
-.actionButtons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.smallButton {
-  background-color: #333;
+.languageSelector {
+  background-color: #333333;
   color: #e0e0e0;
-  border: none;
-  padding: 0.3rem;
+  padding: 0.3rem 0.5rem;
   border-radius: 4px;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.1rem;
+  cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.smallButton:hover {
+.languageSelector:hover {
   background-color: #444;
 }
 
-.translateButton {
-  background-color: #2a5;
-  color: #e0e0e0;
-  border: none;
-  padding: 0.3rem 0.75rem;
+.languageDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #1e1e1e;
+  border: 1px solid #333;
   border-radius: 4px;
+  z-index: 10;
+  min-width: 120px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.languageOption {
+  padding: 0.5rem 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.translateButton:hover {
-  background-color: #3c7;
+.languageOption:hover {
+  background-color: #333;
 }
 
-.translationWrapper {
+.compactTranslationWrapper {
   margin-top: 1rem;
   border-top: 1px solid #333;
   padding-top: 1rem;
+  max-height: 200px; /* Limit translation box height */
+  overflow: auto;
 }
 
 .translatedTextArea {
@@ -101,6 +150,8 @@
   min-height: 150px;
   padding: 0.5rem;
   border-radius: 4px;
+  max-height: 150px;
+  overflow: auto;
 }
 
 .savedTitle {
@@ -149,3 +200,76 @@
   text-align: center;
   padding: 1rem;
 }
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.smallButton {
+  background-color: #333;
+  color: #e0e0e0;
+  border: none;
+  padding: 0.3rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.smallButton:hover {
+  background-color: #444;
+}
+
+.translateButton {
+  background-color: #2a5;
+  color: #e0e0e0;
+  border: none;
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;  
+  transition: background-color 0.2s;
+}
+
+.translateButton:hover {
+  background-color: #3c7;
+}
+
+.translationWrapper {
+  margin-top: 1rem;
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+}
+
+
+
+
+.voiceToTextWrapper {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.voiceToTextButton {
+  background-color: #333;
+  color: #e0e0e0;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.voiceToTextButton:hover {
+  background-color: #4a4a4a;
+}
+
+.voiceToTextButton.active {
+  background-color: #2a5;
+}
+
