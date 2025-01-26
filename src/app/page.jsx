@@ -1,24 +1,37 @@
+"use client";
+
+import React, { useContext } from "react";
 import Image from "next/image";
 import styles from "./page.module.css";
-import Hero from "../../public/hero.png";
+import pngeggLight from "../../public/pngegg.png"; // Light mode image
+import pngeggDark from "../../public/pngegg2.png"; // Dark mode image
 import Button from "@/components/Button/Button";
+import { ThemeContext } from "@/context/ThemeContext";
 
-export default function Home() {
+const Home = () => {
+  const { mode } = useContext(ThemeContext);
+
   return (
     <div className={styles.container}>
       <div className={styles.item}>
         <h1 className={styles.title}>
-          Better design for your digital products.
+        আমাদের ভাষা, আমাদের শক্তি – অংকুর অ্যাপ
         </h1>
         <p className={styles.desc}>
-          Turning your Idea into Reality. We bring together the teams from the
-          global tech industry.
+        বাংলা ও বাংলিশের মাঝে সেতু বন্ধন। সহজে লিখুন, শিখুন এবং সংরক্ষণ করুন।
         </p>
-        <Button url="/portfolio" text="See Our Works"/>
+        <Button url="/dashboard/login" text="শুরু করি" />
       </div>
       <div className={styles.item}>
-        <Image src={Hero} alt="" className={styles.img} />
+        {/* Dynamically choose the image based on the theme */}
+        <Image
+          src={mode === "light" ? pngeggLight : pngeggDark}
+          alt="Theme-based illustration"
+          className={styles.img}
+        />
       </div>
     </div>
   );
-}
+};
+
+export default Home;

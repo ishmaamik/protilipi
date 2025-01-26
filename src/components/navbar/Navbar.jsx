@@ -14,7 +14,7 @@ const links = [
   },
   {
     id: 2,
-    title: "LipiKotha",
+    title: "লিপিকথা",
     url: "/LipiKotha",
   },
   {
@@ -50,7 +50,7 @@ const Navbar = () => {
   return (
     <div className={styles.container}>
       <Link href="/" className={styles.logo}>
-        lamamia
+      অংকুর
       </Link>
       <div className={styles.links}>
         <DarkModeToggle />
