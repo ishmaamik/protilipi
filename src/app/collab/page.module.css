@@ -101,3 +101,102 @@
   .editor :global(.ql-editor::-webkit-scrollbar-thumb:hover) {
     background: #c4a484;
   }
+
+  /* path: src/app/collab/page.module.css */
+/* Add these new styles to your existing CSS file */
+
+.formContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5e6d3;
+    padding: 1.5rem;
+  }
+  
+  .formWrapper {
+    background-color: #fdf5e6;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(139, 69, 19, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .formTitle {
+    font-size: 2rem;
+    color: #8b4513;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .formGroup label {
+    color: #5c3c2e;
+    font-size: 0.9rem;
+  }
+  
+  .input {
+    padding: 0.75rem;
+    border: 1px solid #e6d5c3;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: white;
+    color: #5c3c2e;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: #8b4513;
+    box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.1);
+  }
+  
+  .checkbox {
+    margin-right: 0.5rem;
+  }
+  
+  .button {
+    background-color: #8b4513;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .button:hover {
+    background-color: #a67b5b;
+  }
+  
+  .error {
+    color: #dc2626;
+    font-size: 0.9rem;
+    margin-top: -0.5rem;
+  }
+  
+  .headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .roomInfo {
+    color: #a67b5b;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.75rem;
+    background-color: #fff5e6;
+    border-radius: 4px;
+  }

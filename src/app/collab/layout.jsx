@@ -1,13 +1,12 @@
-//src/app/collab/layout.jsx
-import React from 'react'
-import styles from './page.module.css'
+import React from 'react';
+import styles from './page.module.css';
 
-const Layout = ({children}) => {
+const Layout = ({ children }) => {
   return (
-    <div>
+    <div className={styles.layoutContainer}>
       {children}
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
