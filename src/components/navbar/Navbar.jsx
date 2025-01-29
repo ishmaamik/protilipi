@@ -34,16 +34,31 @@ const links = [
   },
   {
     id: 6,
+    title: "ছবিগল্প",
+    url: "/protected",
+  },
+  {
+    id: 7,
+    title: "PDFগল্প",
+    url: "/pdf",
+  },
+  {
+    id: 8,
+    title: "ছবি",
+    url: "/uploadImage",
+  },
+  {
+    id: 9,
     title: "About",
     url: "/about",
   },
   {
-    id: 7,
+    id: 10,
     title: "Contact",
     url: "/contact",
   },
   {
-    id: 8,
+    id: 11,
     title: "Dashboard",
     url: "/dashboard",
   },
