@@ -21,6 +21,11 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap"
           rel="stylesheet"
         />
+        {/* Cloudinary Widget Script */}
+        <script
+          src="https://widget.cloudinary.com/v2.0/global/all.js"
+          async
+        ></script>
       </head>
       <body className={inter.className}>
         <ThemeProvider>
