@@ -4,6 +4,7 @@ import { UploadCloudIcon, X } from "lucide-react";
 import React, { useMemo, forwardRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { twMerge } from "tailwind-merge";
+import Image from "next/image";
 
 const variants = {
   base: "relative rounded-md flex justify-center items-center flex-col cursor-pointer min-h-[150px] min-w-[200px] border border-dashed border-gray-300 transition-colors duration-200 ease-in-out",
@@ -34,7 +35,7 @@ const SingleImageDropzone = forwardRef((props, ref) => {
     onChange,
   } = props;
 
-  const imageUrl = useMemo(() => {
+  const Url = useMemo(() => {
     if (typeof value === "string") {
       return value; // Use the URL if a string is passed
     } else if (value) {
@@ -52,7 +53,7 @@ const SingleImageDropzone = forwardRef((props, ref) => {
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: { "image/*": [] },
+    accept: { "/*": [] },
     multiple: false,
     disabled,
     onDrop: (acceptedFiles) => {
@@ -70,14 +71,14 @@ const SingleImageDropzone = forwardRef((props, ref) => {
         variants.base,
         isFocused && variants.active,
         disabled && variants.disabled,
-        imageUrl && variants.image,
+        Url && variants.,
         (isDragReject || fileRejections[0]) && variants.reject,
         isDragAccept && variants.accept,
         className
       ).trim(),
     [
       isFocused,
-      imageUrl,
+      Url,
       fileRejections,
       isDragAccept,
       isDragReject,
@@ -112,8 +113,8 @@ const SingleImageDropzone = forwardRef((props, ref) => {
       >
         <input ref={ref} {...getInputProps()} />
 
-        {imageUrl ? (
-          <img
+        {Url ? (
+          <Image
             className="h-full w-full rounded-md object-cover"
             src={imageUrl}
             alt={acceptedFiles[0]?.name || "Uploaded file"}
