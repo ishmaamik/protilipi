@@ -9,11 +9,11 @@ import {
   Mic
 } from 'lucide-react';
 import useTranslate from "@/hooks/useTranslate";
-import '@fontsource/inter'; // Import Inter font
+// import '@fontsource/inter'; // Import Inter font
 // import '@fontsource/arial';
 // Import Arial font
 //import '@fontsource/times-new-roman'; // Custom package for Times New Roman (optional)
-import '@fontsource/roboto'; // Example: Add another font
+// import '@fontsource/roboto'; // Example: Add another font
 // import '@fontsource/noto-sans-bengali';
 
 

@@ -11,7 +11,7 @@
   "dependencies": {
     "@edgestore/react": "^0.2.2",
     "@edgestore/server": "^0.2.2",
-    "@fontsource/inter": "^5.1.1",
+    "@fontsource/inter": "^5.2.6",
     "@fontsource/roboto": "^5.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
@@ -49,5 +49,10 @@
     "tesseract.js": "^6.0.0",
     "ws": "^8.18.0",
     "zod": "^3.24.1"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.9",
+    "encoding": "^0.1.13",
+    "utf-8-validate": "^6.0.5"
   }
 }

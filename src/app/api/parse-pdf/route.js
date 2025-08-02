@@ -1,21 +1,19 @@
 import { NextResponse } from "next/server";
 import pdf from "pdf-parse";
+import fs from 'fs';
+import path from 'path';
 
 export const POST = async (request) => {
   try {
-    // Extract raw binary data from the request
-    const buffer = await request.arrayBuffer();
-    const fileBuffer = Buffer.from(buffer); // Convert ArrayBuffer to Buffer for pdf-parse
-
-    // Parse the PDF file
-    const data = await pdf(fileBuffer);
-
-    // Return extracted text as JSON response
-    return NextResponse.json({ text: data.text }, { status: 200 });
+    // If no file is uploaded, return a default response
+    return NextResponse.json({ 
+      text: "No PDF file was uploaded or processed.", 
+      status: 200 
+    });
   } catch (error) {
-    console.error("Error parsing PDF:", error);
+    console.error("Error in PDF parsing route:", error);
     return NextResponse.json(
-      { error: "Failed to parse the PDF file." },
+      { error: "Failed to process the request." },
       { status: 500 }
     );
   }

@@ -2,18 +2,25 @@
 
 import { MultiFileDropzone } from "@/components/multi-file-dropzone";
 import { useEdgeStore } from "@/lib/edgestore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Page() {
-  const [fileStates, setFileStates] = useState([]); // Removed TypeScript type
+  const [fileStates, setFileStates] = useState([]); 
   const [urls, setUrls] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isCancelled, setIsCancelled] = useState(false);
-  const { edgestore } = useEdgeStore();
+  const [edgeStoreReady, setEdgeStoreReady] = useState(false);
+  const edgeStoreHook = useEdgeStore();
+
+  useEffect(() => {
+    if (edgeStoreHook.edgestore) {
+      setEdgeStoreReady(true);
+    }
+  }, [edgeStoreHook]);
 
   function updateFileProgress(key, progress) {
     setFileStates((fileStates) => {
-      const newFileStates = JSON.parse(JSON.stringify(fileStates)); // Use JSON.parse for cloning
+      const newFileStates = JSON.parse(JSON.stringify(fileStates)); 
       const fileState = newFileStates.find(
         (fileState) => fileState.key === key
       );
@@ -31,6 +38,10 @@ export default function Page() {
     return <div className="flex flex-col items-center m-6">CANCELLED!!!</div>;
   }
 
+  if (!edgeStoreReady) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="flex flex-col items-center m-6">
       <div className="flex gap-4">
@@ -44,7 +55,7 @@ export default function Page() {
             await Promise.all(
               addedFiles.map(async (addedFileState) => {
                 try {
-                  const res = await edgestore.myProtectedFiles.upload({
+                  const res = await edgeStoreHook.edgestore.myProtectedFiles.upload({
                     file: addedFileState.file,
                     options: {
                       temporary: true,
@@ -89,7 +100,7 @@ export default function Page() {
               className="bg-white text-black rounded px-3 py-1 hover:opacity-80"
               onClick={async () => {
                 for (const url of urls) {
-                  await edgestore.myProtectedFiles.confirmUpload({
+                  await edgeStoreHook.edgestore.myProtectedFiles.confirmUpload({
                     url,
                   });
                 }
