@@ -4,15 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx browserslist@latest --update-db && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "prepare": "npm audit fix"
+    "lint": "next lint"
   },
   "dependencies": {
     "@edgestore/react": "^0.2.2",
     "@edgestore/server": "^0.2.2",
-    "@fontsource/inter": "^5.0.15",
+    "@fontsource/inter": "^5.1.1",
     "@fontsource/noto-sans-bengali": "^5.0.15",
     "@fontsource/roboto": "^5.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
@@ -33,12 +32,12 @@
     "eslint-config-next": "13.4.3",
     "iron-session": "^8.0.0-beta.5",
     "lucide-react": "^0.474.0",
-    "mongoose": "6.11.1",
-    "next": "13.4.3",
+    "mongoose": "^6.13.8",
+    "next": "^13.5.11",
     "next-auth": "^4.22.1",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
-    "pdfjs-dist": "^3.9.179",
+    "pdfjs-dist": "^5.4.54",
     "preline": "^2.7.0",
     "quill": "^2.0.3",
     "react": "18.2.0",
@@ -58,8 +57,6 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.28.0",
-    "babel-loader": "^10.0.0",
     "regenerator-runtime": "^0.14.1"
   }
 }
