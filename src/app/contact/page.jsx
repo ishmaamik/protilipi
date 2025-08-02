@@ -34,7 +34,7 @@ const Contact = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Let's Keep in Touch</h1>
+      <h1 className={styles.title}>Let&rsquo;s Keep in Touch</h1>
       <div className={styles.content}>
         <div className={styles.imgContainer}>
           <Image
