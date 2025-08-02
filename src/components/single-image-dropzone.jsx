@@ -53,7 +53,7 @@ const SingleImageDropzone = forwardRef((props, ref) => {
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: { "/*": [] },
+    accept: { 'image/*': [] },
     multiple: false,
     disabled,
     onDrop: (acceptedFiles) => {
@@ -71,7 +71,7 @@ const SingleImageDropzone = forwardRef((props, ref) => {
         variants.base,
         isFocused && variants.active,
         disabled && variants.disabled,
-        Url && variants.,
+        imageUrl && variants.image,
         (isDragReject || fileRejections[0]) && variants.reject,
         isDragAccept && variants.accept,
         className
