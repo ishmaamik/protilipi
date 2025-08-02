@@ -1,11 +1,23 @@
 import Navbar from "@/components/navbar/Navbar";
 import "./globals.css";
-import { Inter, Roboto, Poppins } from "next/font/google";
+import { Inter, Noto_Sans_Bengali } from "next/font/google";
+import Script from "next/script";
 import Footer from "@/components/footer/Footer";
 import { ThemeProvider } from "@/context/ThemeContext";
 import AuthProvider from "@/components/AuthProvider/AuthProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+// Fallback font config
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  fallback: ['system-ui', 'arial']
+});
+
+const bengali = Noto_Sans_Bengali({
+  subsets: ["bengali"],
+  display: 'swap',
+  fallback: ['sans-serif']
+});
 
 export const metadata = {
   title: "IUT_ACCESS_DENIED",
@@ -14,20 +26,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Google Fonts for Noto Sans Bengali */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap"
-          rel="stylesheet"
+        <Script 
+          src="https://widget.cloudinary.com/v2.0/global/all.js" 
+          strategy="lazyOnload"
         />
-        {/* Cloudinary Widget Script */}
-        <script
-          src="https://widget.cloudinary.com/v2.0/global/all.js"
-          async
-        ></script>
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${bengali.variable}`}>
         <ThemeProvider>
           <AuthProvider>
             <div className="container">
