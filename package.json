@@ -12,7 +12,8 @@
   "dependencies": {
     "@edgestore/react": "^0.2.2",
     "@edgestore/server": "^0.2.2",
-    "@fontsource/inter": "^5.1.1",
+    "@fontsource/inter": "^5.0.15",
+    "@fontsource/noto-sans-bengali": "^5.0.15",
     "@fontsource/roboto": "^5.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
@@ -24,8 +25,10 @@
     "@types/socket.io-client": "^1.4.36",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
+    "bufferutil": "^4.0.7",
     "canvas": "^3.1.0",
     "cloudinary": "^2.5.1",
+    "encoding": "^0.1.13",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.3",
     "iron-session": "^8.0.0-beta.5",
@@ -43,18 +46,32 @@
     "react-dropzone": "^14.3.5",
     "react-markdown": "^9.0.3",
     "react-speech-recognition": "^3.10.0",
+    "regenerator-runtime": "^0.14.0",
+    "sharp": "^0.32.6",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "swr": "^2.1.5",
     "tailwind-merge": "^2.6.0",
     "tesseract.js": "^6.0.0",
-    "ws": "^8.18.0",
-    "zod": "^3.24.1",
-    "bufferutil": "^4.0.7",
     "utf-8-validate": "^5.0.10",
-    "sharp": "^0.32.6",
-    "encoding": "^0.1.13",
-    "@fontsource/inter": "^5.0.15",  
-    "@fontsource/noto-sans-bengali": "^5.0.15"
+    "ws": "^8.18.0",
+    "zod": "^3.24.1"
+  },
+  "babel": {
+    "presets": [
+      "next/babel"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-transform-runtime",
+        {
+          "regenerator": true
+        }
+      ]
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.28.0",
+    "regenerator-runtime": "^0.14.1"
   }
 }

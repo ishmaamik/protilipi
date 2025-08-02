@@ -11,6 +11,13 @@ const nextConfig = {
         fs: false,
       };
     }
+
+    // Add support for regenerator-runtime
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'regenerator-runtime/runtime': require.resolve('regenerator-runtime/runtime'),
+    };
+
     return config;
   },
 };
