@@ -52,6 +52,6 @@
     "bufferutil": "^4.0.7",
     "utf-8-validate": "^5.0.10",
     "sharp": "^0.32.6",
-    "encoding": "^0.1.13
+    "encoding": "^0.1.13"
   }
 }
