@@ -13,12 +13,17 @@ const nextConfig = {
     }
 
     // Add support for regenerator-runtime
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'regenerator-runtime/runtime': require.resolve('regenerator-runtime/runtime'),
-    };
+    config.module.rules.push({
+      test: /regenerator-runtime/,
+      use: 'babel-loader',
+    });
 
     return config;
+  },
+  compiler: {
+    // Enables the SWC compiler
+    reactRemoveProperties: true,
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 };
 

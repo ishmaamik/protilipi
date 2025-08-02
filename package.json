@@ -57,21 +57,9 @@
     "ws": "^8.18.0",
     "zod": "^3.24.1"
   },
-  "babel": {
-    "presets": [
-      "next/babel"
-    ],
-    "plugins": [
-      [
-        "@babel/plugin-transform-runtime",
-        {
-          "regenerator": true
-        }
-      ]
-    ]
-  },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.28.0",
+    "babel-loader": "^10.0.0",
     "regenerator-runtime": "^0.14.1"
   }
 }
