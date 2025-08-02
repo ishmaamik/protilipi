@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx browserslist@latest --update-db && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "npm audit fix"
   },
   "dependencies": {
     "@edgestore/react": "^0.2.2",

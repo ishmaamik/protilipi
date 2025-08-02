@@ -1,12 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    domains: ["images.pexels.com"],
-  },
   experimental: {
-    proxyTimeout: 30000,
+    proxyTimeout: true,
     workerThreads: true,
-  }
+  },
+  webpack: (config, { isServer }) => {
+    // Ignore missing test files during build
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false,
+      };
+    }
+    return config;
+  },
 };
 
 module.exports = nextConfig;
