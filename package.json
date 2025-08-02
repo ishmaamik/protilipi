@@ -48,6 +48,10 @@
     "tailwind-merge": "^2.6.0",
     "tesseract.js": "^6.0.0",
     "ws": "^8.18.0",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10",
+    "sharp": "^0.32.6",
+    "encoding": "^0.1.13
   }
 }
