@@ -30,7 +30,7 @@ export function SocketProvider({ children }) {
     return () => {
       socket?.disconnect();
     };
-  }, []);
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={socket}>
