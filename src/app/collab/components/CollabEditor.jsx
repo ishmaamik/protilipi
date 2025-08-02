@@ -34,7 +34,7 @@ const CollabEditor = ({ roomId, username }) => {
 
     setQuill(quillInstance);
 
-    socketRef.current = new WebSocket('ws://localhost:3001');
+    socketRef.current = new WebSocket('https://socket-server-sepia.vercel.app/');
 
     socketRef.current.onopen = () => {
       console.log('WebSocket Connected');
